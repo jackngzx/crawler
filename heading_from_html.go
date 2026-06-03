@@ -25,6 +25,7 @@ func getHeadingFromHTML(html string) string {
 	}
 	return h1Heading
 }
+
 func getFirstParagraphFromHTML(html string) string {
 	r := strings.NewReader(html)
 	doc, err := goquery.NewDocumentFromReader(r)
@@ -34,7 +35,12 @@ func getFirstParagraphFromHTML(html string) string {
 	main := doc.Find("main")
 	if main.Text() == "" {
 		fmt.Println("main body is not found")
-		return ""
+		paragraphs := doc.Find("p").First()
+		if paragraphs.Text() == "" {
+			fmt.Println("main paragraph is not found")
+			return ""
+		}
+		return paragraphs.First().Text()
 	}
 	paragraphs := main.Find("p")
 	if paragraphs.Text() == "" {
