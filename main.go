@@ -60,20 +60,25 @@ func main() {
 		return
 	}
 
-	c, err := newConfig(os.Args[1], maxConcurrency, maxPages)
+	cfg, err := newConfig(os.Args[1], maxConcurrency, maxPages)
 	if err != nil {
 		fmt.Print(err)
 		return
 	}
 
-	c.wg.Add(1)
-	go c.crawlPage(os.Args[1])
-	c.wg.Wait()
+	cfg.wg.Add(1)
+	go cfg.crawlPage(os.Args[1])
+	cfg.wg.Wait()
 
-	for normalizedURL := range c.pages {
+	for normalizedURL := range cfg.pages {
 		fmt.Printf("urls crawled: %s\n", normalizedURL)
 	}
 	fmt.Println("finished crawling pages")
+
+	err = writeJSONReport(cfg.pages, "report.json")
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func getHTML(rawURL string) (string, error) {
